@@ -1,7 +1,6 @@
 import re
 import math
 import random
-from datetime import datetime
 from pathlib import Path
 import os
 
@@ -54,7 +53,7 @@ class Cryptography:
 
         return cipher
 
-    def decrypt(self, cipher: str) -> tuple:
+    def decrypt(self, cipher: str, iterates: int=1000) -> tuple:
         """
         Decrypt Mono-alphabetic substitution using Stochastic Hill Climbing
         """
@@ -63,7 +62,7 @@ class Cryptography:
         decrypted_key = []
         key = []
         for _ in range(10):
-            key_score, key, plaintext = self.decrypt_hillclimbing(cipher, 1000)
+            key_score, key, plaintext = self.decrypt_hillclimbing(cipher, iterates)
             if key_score > max:
                 max = key_score
                 decrypted_cipher = plaintext

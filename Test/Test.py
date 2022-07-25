@@ -6,7 +6,7 @@ from src.Cryptography import Cryptography
 from datetime import datetime
 import argparse
 
-
+ITERATE = 350
 class TestCryptography:
     def __init__(self) -> None:
         n_grams, self.__length = self.args_stmt()
@@ -18,15 +18,15 @@ class TestCryptography:
         samples = [int(re.findall("\d+", text)[-1]) for text in os.listdir(data_path)]
         parser = argparse.ArgumentParser()
         parser.add_argument(
-            "-ng", "--ngrams", help="Enter your ngrams you need to test"
+            "-ng", "--ngrams", help="Enter ngrams you need to test"
         )
 
         parser.add_argument(
-            "-l", "--length", help="Length of paragraph which you want to test"
+            "-l", "--length", help="Length of the paragraph which you want to test"
         )
 
         args = parser.parse_args()
-        
+
         n_grams = int(args.ngrams) if args.ngrams else 2
         length = int(args.length) if args.length else 50
 
@@ -45,15 +45,15 @@ class TestCryptography:
         )
 
         now = datetime.now()
-        
+
         print(f"Length: {self.__length}")
         key = self.__crypto.generate_random_key()
         message = open(message_path, "r").read()
         cipher = self.__crypto.encrypt(message, key)
 
-        plain_text, _ = self.__crypto.decrypt(cipher)
+        plain_text, _ = self.__crypto.decrypt(cipher=cipher, iterates=ITERATE)
         count = 0
-        
+
         plain_words = plain_text.split()
         message_words = message.strip().split()
         for i in range(len(plain_words)):
