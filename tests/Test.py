@@ -11,8 +11,8 @@ ITERATE = 350
 
 class TestCryptography:
     def __init__(self) -> None:
-        n_grams, self.__length = self.args_stmt()
-        self.__crypto = Cryptography(ngrams=n_grams)
+        self.__n_grams, self.__length = self.args_stmt()
+        self.__crypto = Cryptography(ngrams=self.__n_grams)
 
     def args_stmt(self):
         path = Path(__file__).parent.parent
@@ -46,7 +46,7 @@ class TestCryptography:
 
         now = datetime.now()
 
-        print(f"Length: {self.__length}")
+        print(f"Length: {self.__length}, ngrams: {self.__n_grams}")
         key = self.__crypto.generate_random_key()
         message = open(message_path, "r").read()
         cipher = self.__crypto.encrypt(message, key)
@@ -60,6 +60,7 @@ class TestCryptography:
             if message_words[i].lower() == plain_words[i].lower():
                 count += 1
 
+        print(f"{' '.join(plain_words[0 : int(0.1*len(plain_words))])}...")
         print(
             f"{(datetime.now() - now)}: {count/len(message_words)}, {count}/{len(message_words)}"
         )
