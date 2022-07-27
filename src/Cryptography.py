@@ -26,8 +26,8 @@ class Cryptography:
             else:
                 ngrams_mapped = self.__NGRAMS_MAP[ngrams]
 
-            CUR_PATH = Path(__file__).parent.parent
-            ngrams_path = os.path.join(CUR_PATH, f"data/ngrams/{ngrams_mapped}.json")
+            CUR_PATH = Path(__file__).parent
+            ngrams_path = os.path.join(CUR_PATH, f"../data/ngrams/{ngrams_mapped}.json")
             self.__NGRAMS = self.__load_ngrams(ngrams_path)
 
     def __load_ngrams(self, path):
