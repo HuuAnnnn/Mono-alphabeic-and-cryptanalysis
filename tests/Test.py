@@ -1,11 +1,14 @@
 import os
 from pathlib import Path
 import re
+from context import src
 from src.Cryptography import Cryptography
 from datetime import datetime
 import argparse
 
 ITERATE = 350
+
+
 class TestCryptography:
     def __init__(self) -> None:
         n_grams, self.__length = self.args_stmt()
@@ -16,9 +19,7 @@ class TestCryptography:
         data_path = os.path.join(path, "data/plaintext")
         samples = [int(re.findall("\d+", text)[-1]) for text in os.listdir(data_path)]
         parser = argparse.ArgumentParser()
-        parser.add_argument(
-            "-ng", "--ngrams", help="Enter ngrams you need to test"
-        )
+        parser.add_argument("-ng", "--ngrams", help="Enter ngrams you need to test")
 
         parser.add_argument(
             "-l", "--length", help="Length of the paragraph which you want to test"
