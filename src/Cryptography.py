@@ -3,16 +3,17 @@ import math
 import random
 from pathlib import Path
 import os
+import json
 
 
 class Cryptography:
     __ALPHABET = [chr(char) for char in range(65, 91)]
     __NGRAM = None
     __NGRAMS_MAP = {
-        1: "unigram",
-        2: "bigram",
-        3: "trigram",
-        4: "quadgram",
+        1: "unigrams",
+        2: "bigrams",
+        3: "trigrams",
+        4: "quadgrams",
         5: "quintgrams",
     }
 
@@ -26,22 +27,11 @@ class Cryptography:
                 ngrams_mapped = self.__NGRAMS_MAP[ngrams]
 
             CUR_PATH = Path(__file__).parent.parent
-            ngrams_path = os.path.join(CUR_PATH, f"data/ngrams/{ngrams_mapped}.txt")
+            ngrams_path = os.path.join(CUR_PATH, f"data/ngrams/{ngrams_mapped}.json")
             self.__NGRAMS = self.__load_ngrams(ngrams_path)
 
     def __load_ngrams(self, path):
-        ngram_dict = {}
-        message = ""
-        with open(path, "r") as f:
-            message = f.read()
-
-        ngrams = message.strip().split("\n")
-
-        for ngram in ngrams:
-            key_ngram, count = tuple(ngram.split(" "))
-            ngram_dict[key_ngram] = int(count)
-
-        return ngram_dict
+        return json.load(open(path, "r"))
 
     def encrypt(self, message: str, key: list) -> str:
         """'
@@ -53,7 +43,7 @@ class Cryptography:
 
         return cipher
 
-    def decrypt(self, cipher: str, iterates: int=1000) -> tuple:
+    def decrypt(self, cipher: str, iterates: int = 1000) -> tuple:
         """
         Decrypt Mono-alphabetic substitution using Stochastic Hill Climbing
         """
