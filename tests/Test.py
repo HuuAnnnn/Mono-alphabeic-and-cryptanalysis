@@ -51,7 +51,9 @@ class TestCryptography:
         message = open(message_path, "r").read()
         cipher = self.__crypto.encrypt(message, key)
 
-        plain_text, _ = self.__crypto.decrypt(cipher=cipher, iterates=ITERATE)
+        # plain_text, _ = self.__crypto.decrypt(cipher=cipher, iterates=ITERATE)
+        key = self.__crypto.genetic_decrypt_cipher(cipher_text=cipher)
+        plain_text = self.__crypto.decrypt_mono_substitution(cipher, key)
         count = 0
 
         plain_words = plain_text.split()
