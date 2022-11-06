@@ -1,9 +1,13 @@
+from collections import defaultdict
+import itertools
 import re
 import math
 import random
 from pathlib import Path
 import os
 import json
+
+from tqdm import tqdm
 
 
 class Cryptography:
@@ -93,6 +97,93 @@ class Cryptography:
             message = message.replace(key[i], self.__ALPHABET[i].lower())
 
         return message
+
+    def create_chromosome(self):
+        return self.generate_random_key()
+
+    def create_population(self, size: int = 5):
+        return [self.create_chromosome() for _ in range(size)]
+
+    def selection(self, population, cipher_text):
+        score_population = {}
+        for i in range(len(population)):
+            individual = population[i]
+            decrypt_text = self.decrypt_mono_substitution(cipher_text, individual)
+            score_population[i] = (self.score(decrypt_text.upper()), individual)
+
+        return sorted(score_population.items(), key=lambda x: x[1][0], reverse=True)
+
+    def genetic_decrypt_cipher(self, cipher_text):
+        p_bar = tqdm(range(1, 1001), desc="Process")
+        population = self.create_population(20)
+        num_of_offspring = 1000
+
+        for i in range(num_of_offspring):
+            selection = self.selection(population, cipher_text)
+            p_bar.set_description(f"Offspring {i + 1}: {selection[0][1][0]}")
+            best_parent = [(population[selection[0][0]], population[selection[1][0]])]
+            best_parent += random.sample(list(itertools.permutations(population, 2)), 8)
+            offsprings = []
+            for pair in best_parent:
+                parent_1, parent_2 = pair
+                child1, child2 = tuple(self.cross_over(parent_1, parent_2))
+                self.mutation(child1, 2e-5)
+                self.mutation(child2, 2e-5)
+                offsprings.extend([parent_1, parent_2, child1, child2])
+
+            population = offsprings
+            p_bar.update(1)
+
+        return self.selection(population, cipher_text)[0][1][1]
+
+    def cross_over(self, parent_1, parent_2, cross_over_rate: float = 0.5):
+        cutting_point = int(cross_over_rate * len(parent_1))
+
+        offspring1 = parent_1[0:cutting_point]
+        offspring2 = parent_2[0:cutting_point]
+
+        rest_parent_1 = [
+            "" if gene in offspring1 else gene for gene in parent_2[cutting_point::]
+        ]
+
+        rest_parent_2 = [
+            "" if gene in offspring2 else gene for gene in parent_1[cutting_point::]
+        ]
+
+        random_letters = random.sample(
+            set(self.__ALPHABET)
+            .difference(set(offspring2))
+            .difference(set(rest_parent_1)),
+            rest_parent_1.count(""),
+        )
+        k = 0
+        for i in range(len(rest_parent_1)):
+            if rest_parent_1[i] == "":
+                rest_parent_1[i] = random_letters[k]
+                k += 1
+
+        random_letters = random.sample(
+            set(self.__ALPHABET)
+            .difference(set(offspring1))
+            .difference(set(rest_parent_2)),
+            rest_parent_2.count(""),
+        )
+
+        k = 0
+        for i in range(len(rest_parent_2)):
+            if rest_parent_2[i] == "":
+                rest_parent_2[i] = random_letters[k]
+                k += 1
+
+        offspring1 += rest_parent_2
+        offspring2 += rest_parent_1
+
+        return [offspring1, offspring2]
+
+    def mutation(self, chromosome, mutation_rate: float = 0.1):
+        num_mutate_genes = int(mutation_rate * len(chromosome))
+        for _ in range((num_mutate_genes // 2) + 1):
+            self.swap_randomly_2_pos(chromosome)
 
     def generate_random_key(self):
         return random.sample(self.__ALPHABET, 26)
